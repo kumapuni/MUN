@@ -15,9 +15,9 @@ export const defaultState = {
   speakers: [],
   attendance: [],
   fileView: {
+    id: "",
     name: "",
-    type: "",
-    dataUrl: ""
+    type: ""
   },
   availableViews: [
     { id: "title", label: "タイトル" },
@@ -36,6 +36,11 @@ const STORAGE_KEY = "mun-state";
 const normalizeState = (state) => ({
   ...defaultState,
   ...state,
+  fileView: {
+    ...defaultState.fileView,
+    ...(state?.fileView ?? {}),
+    dataUrl: ""
+  },
   updatedAt: state?.updatedAt ?? Date.now()
 });
 
@@ -109,9 +114,16 @@ export const useSharedState = (isController) => {
 
     syncTimerRef.current = setTimeout(() => {
       const snapshot = stateRef.current;
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
+      const sanitized = {
+        ...snapshot,
+        fileView: {
+          ...snapshot.fileView,
+          dataUrl: ""
+        }
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(sanitized));
       const channel = new BroadcastChannel("mun-channel");
-      channel.postMessage({ type: "state", state: snapshot });
+      channel.postMessage({ type: "state", state: sanitized });
       channel.close();
     }, 120);
 

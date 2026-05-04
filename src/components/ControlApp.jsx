@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import DisplayScreen from "./DisplayScreen.jsx";
 import { defaultState, useSharedState } from "../hooks/useSharedState.js";
 import {
@@ -8,12 +8,18 @@ import {
   updateTimerState,
   withTimerRunning
 } from "../utils/stateUtils.js";
+import {
+  loadFileDataUrl,
+  removeFile,
+  saveFile
+} from "../utils/fileStore.js";
 
 export default function ControlApp() {
   const [state, setState] = useSharedState(true);
   const [speakerName, setSpeakerName] = useState("");
   const [attendanceName, setAttendanceName] = useState("");
   const [timerInput, setTimerInput] = useState(5);
+  const [filePreviewUrl, setFilePreviewUrl] = useState("");
 
   const openDisplayWindow = useCallback(() => {
     const url = `${window.location.origin}${window.location.pathname}?display=1`;
@@ -124,33 +130,80 @@ export default function ControlApp() {
     const file = event.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = () => {
-      setState((prev) => ({
-        ...prev,
-        fileView: {
+    reader.onload = async () => {
+      const dataUrl = reader.result;
+      if (typeof dataUrl !== "string") return;
+      try {
+        const id = await saveFile({
           name: file.name,
           type: file.type,
-          dataUrl: reader.result
-        }
-      }));
+          dataUrl
+        });
+        setState((prev) => ({
+          ...prev,
+          fileView: {
+            id,
+            name: file.name,
+            type: file.type
+          }
+        }));
+        setFilePreviewUrl(dataUrl);
+      } catch {
+        setFilePreviewUrl("");
+      }
     };
     reader.readAsDataURL(file);
   };
 
   const handleFileClear = () => {
+    if (state.fileView?.id) {
+      removeFile(state.fileView.id).catch(() => {});
+    }
     updateState({
       fileView: {
+        id: "",
         name: "",
-        type: "",
-        dataUrl: ""
+        type: ""
       }
     });
+    setFilePreviewUrl("");
   };
+
+  useEffect(() => {
+    let active = true;
+
+    if (!state.fileView?.id) {
+      setFilePreviewUrl("");
+      return undefined;
+    }
+
+    loadFileDataUrl(state.fileView.id)
+      .then((dataUrl) => {
+        if (active) setFilePreviewUrl(dataUrl || "");
+      })
+      .catch(() => {
+        if (active) setFilePreviewUrl("");
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [state.fileView?.id]);
 
   const currentTimer = useMemo(() => {
     const remaining = updateTimerState(state.timer).remaining;
     return formatDuration(remaining);
   }, [state.timer]);
+
+  const previewState = useMemo(() => {
+    return {
+      ...state,
+      fileView: {
+        ...state.fileView,
+        dataUrl: filePreviewUrl
+      }
+    };
+  }, [state, filePreviewUrl]);
 
   return (
     <div className="app-layout">
@@ -354,6 +407,9 @@ export default function ControlApp() {
           <p className="helper">
             PPTX/XLSXはブラウザの対応状況によっては表示できない場合があります。可能ならPDFを推奨します。
           </p>
+          <p className="helper">
+            ブラウザ保存容量の上限があるため、目安として50MB以下でアップロードしてください。
+          </p>
           <input
             type="file"
             className="file-input"
@@ -379,7 +435,7 @@ export default function ControlApp() {
           </p>
         </div>
         <div className="preview-screen">
-          <DisplayScreen state={state} isPreview />
+          <DisplayScreen state={previewState} isPreview />
         </div>
       </main>
     </div>
