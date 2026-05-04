@@ -140,8 +140,14 @@ button.ghost {
   margin-top: 8px;
 }
 
-.file-name {
+.file-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin-top: 8px;
+}
+
+.file-name {
   font-size: 14px;
 }
 

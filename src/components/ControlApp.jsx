@@ -137,6 +137,16 @@ export default function ControlApp() {
     reader.readAsDataURL(file);
   };
 
+  const handleFileClear = () => {
+    updateState({
+      fileView: {
+        name: "",
+        type: "",
+        dataUrl: ""
+      }
+    });
+  };
+
   const currentTimer = useMemo(() => {
     const remaining = updateTimerState(state.timer).remaining;
     return formatDuration(remaining);
@@ -351,7 +361,12 @@ export default function ControlApp() {
             onChange={handleFileChange}
           />
           {state.fileView?.name && (
-            <div className="file-name">読み込み: {state.fileView.name}</div>
+            <div className="file-meta">
+              <div className="file-name">読み込み: {state.fileView.name}</div>
+              <button className="ghost" onClick={handleFileClear}>
+                クリア
+              </button>
+            </div>
           )}
         </section>
       </aside>
