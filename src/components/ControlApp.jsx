@@ -209,6 +209,19 @@ export default function ControlApp() {
             </button>
           </div>
           <div className="timer-row">
+            <label>
+              表示タイトル
+              <input
+                className="text-input"
+                value={state.timerLabel}
+                onChange={(event) =>
+                  updateState({ timerLabel: event.target.value })
+                }
+                placeholder="例: モデレート"
+              />
+            </label>
+          </div>
+          <div className="timer-row">
             <button className="accent" onClick={handleTimerStart}>
               開始
             </button>
@@ -243,6 +256,12 @@ export default function ControlApp() {
               className="text-input"
               value={speakerName}
               onChange={(event) => setSpeakerName(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  event.preventDefault();
+                  addSpeaker();
+                }
+              }}
               placeholder="発言者名を入力"
             />
             <button className="secondary" onClick={addSpeaker}>
@@ -282,6 +301,12 @@ export default function ControlApp() {
               className="text-input"
               value={attendanceName}
               onChange={(event) => setAttendanceName(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  event.preventDefault();
+                  addAttendance();
+                }
+              }}
               placeholder="出席者名を入力"
             />
             <button className="secondary" onClick={addAttendance}>
@@ -334,7 +359,9 @@ export default function ControlApp() {
       <main className="preview-panel">
         <div className="preview-header">
           <h2>表示プレビュー</h2>
-          <p>現在の画面: {defaultState.availableViews.find((v) => v.id === state.currentView)?.label}</p>
+          <p>
+            現在の画面: {defaultState.availableViews.find((v) => v.id === state.currentView)?.label}
+          </p>
         </div>
         <div className="preview-screen">
           <DisplayScreen state={state} isPreview />

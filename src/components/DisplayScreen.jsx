@@ -30,6 +30,9 @@ export default function DisplayScreen({ state, isPreview }) {
       {view === "timer" && (
         <div className="screen-center">
           <h1>タイマー</h1>
+          {state.timerLabel?.trim() && (
+            <p className="timer-label">{state.timerLabel}</p>
+          )}
           <p className="clock-text">{formatDuration(state.timer.remaining)}</p>
         </div>
       )}

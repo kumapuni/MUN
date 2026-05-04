@@ -4,6 +4,7 @@ export const defaultState = {
   currentView: "title",
   titleText: "Model United Nations",
   agendaText: "議題を入力してください",
+  timerLabel: "",
   timer: {
     duration: 5 * 60 * 1000,
     remaining: 5 * 60 * 1000,

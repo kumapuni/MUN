@@ -186,17 +186,23 @@ button.ghost {
 }
 
 .screen-center h1 {
-  font-size: 48px;
+  font-size: 54px;
   margin-bottom: 16px;
 }
 
 .large-text {
-  font-size: 32px;
+  font-size: 44px;
   white-space: pre-wrap;
 }
 
+.timer-label {
+  font-size: 36px;
+  margin: 8px 0 16px;
+  font-weight: 600;
+}
+
 .clock-text {
-  font-size: 72px;
+  font-size: 110px;
   font-weight: 700;
 }
 
@@ -208,11 +214,11 @@ button.ghost {
 
 .screen-list h1 {
   margin: 0;
-  font-size: 40px;
+  font-size: 42px;
 }
 
 .screen-list ol {
-  font-size: 32px;
+  font-size: 34px;
   margin: 0;
   padding-left: 24px;
 }
