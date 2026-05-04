@@ -77,6 +77,32 @@ button.ghost {
   color: #cbd5f5;
 }
 
+.status-button {
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.status-button.present {
+  background: rgba(34, 197, 94, 0.2);
+  color: #bbf7d0;
+}
+
+.status-button.present.active {
+  background: #22c55e;
+  color: #052e16;
+}
+
+.status-button.absent {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fecaca;
+}
+
+.status-button.absent.active {
+  background: #ef4444;
+  color: #450a0a;
+}
+
 .text-input,
 .text-area {
   width: 100%;
@@ -145,12 +171,36 @@ button.ghost {
   color: #cbd5f5;
 }
 
+.status-tag.present {
+  color: #22c55e;
+}
+
+.status-tag.absent {
+  color: #f87171;
+}
+
 .attendance-stats {
   display: grid;
   gap: 6px;
   margin-bottom: 12px;
   font-size: 14px;
   color: #cbd5f5;
+}
+
+.attendance-stats.display-stats {
+  font-size: clamp(18px, 2.4vw, 24px);
+  color: #e2e8f0;
+}
+
+.country-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  list-style-position: inside;
+}
+
+.country-list li {
+  width: calc(50% - 12px);
 }
 
 .helper {
@@ -364,5 +414,9 @@ button.ghost {
 @media (max-width: 1024px) {
   .app-layout {
     grid-template-columns: 1fr;
+  }
+
+  .country-list li {
+    width: 100%;
   }
 }

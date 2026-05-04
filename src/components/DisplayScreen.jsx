@@ -4,6 +4,19 @@ export default function DisplayScreen({ state, isPreview }) {
   const view = state.currentView;
 
   const screenClass = isPreview ? "screen preview" : "screen";
+  const attendanceTotal = state.attendance.length;
+  const attendancePresent = state.attendance.filter(
+    (member) => member.status === "present"
+  ).length;
+  const attendanceRate = attendanceTotal
+    ? Math.round((attendancePresent / attendanceTotal) * 100)
+    : 0;
+  const attendanceMajority = attendancePresent
+    ? Math.floor(attendancePresent / 2) + 1
+    : 0;
+  const attendanceTwoThirds = attendancePresent
+    ? Math.ceil((attendancePresent * 2) / 3)
+    : 0;
 
   return (
     <div className={screenClass}>
@@ -71,15 +84,21 @@ export default function DisplayScreen({ state, isPreview }) {
       {view === "attendance" && (
         <div className="screen-list">
           <h1>国リスト</h1>
-          <ol>
+          <div className="attendance-stats display-stats">
+            <div>出席数: {attendancePresent} / {attendanceTotal}</div>
+            <div>出席率: {attendanceRate}%</div>
+            <div>過半数: {attendanceMajority}</div>
+            <div>出席数の3分の2: {attendanceTwoThirds}</div>
+          </div>
+          <ol className="country-list">
             {state.attendance.map((member) => (
               <li key={member.id}>
                 {member.name}
-                {member.status === "present"
-                  ? "（出席）"
-                  : member.status === "absent"
-                    ? "（欠席）"
-                    : ""}
+                {member.status === "present" ? (
+                  <span className="status-tag present">出席</span>
+                ) : member.status === "absent" ? (
+                  <span className="status-tag absent">欠席</span>
+                ) : null}
               </li>
             ))}
           </ol>

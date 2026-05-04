@@ -422,7 +422,15 @@ export default function ControlApp() {
               >
                 <span>
                   {member.name}
-                  <span className="status-tag">
+                  <span
+                    className={`status-tag ${
+                      member.status === "present"
+                        ? "present"
+                        : member.status === "absent"
+                          ? "absent"
+                          : "pending"
+                    }`}
+                  >
                     {member.status === "present"
                       ? "出席"
                       : member.status === "absent"
@@ -432,17 +440,17 @@ export default function ControlApp() {
                 </span>
                 <div className="list-actions">
                   <button
-                    className={
-                      member.status === "present" ? "accent" : "secondary"
-                    }
+                    className={`status-button present ${
+                      member.status === "present" ? "active" : ""
+                    }`}
                     onClick={() => handleAttendanceStatus(member.id, "present")}
                   >
                     出席
                   </button>
                   <button
-                    className={
-                      member.status === "absent" ? "accent" : "secondary"
-                    }
+                    className={`status-button absent ${
+                      member.status === "absent" ? "active" : ""
+                    }`}
                     onClick={() => handleAttendanceStatus(member.id, "absent")}
                   >
                     欠席
