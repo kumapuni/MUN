@@ -4,6 +4,7 @@ export default function DisplayScreen({ state, isPreview }) {
   const view = state.currentView;
 
   const screenClass = isPreview ? "screen preview" : "screen";
+  const currentSpeaker = state.speakers?.[0]?.name;
 
   return (
     <div className={screenClass}>
@@ -59,7 +60,9 @@ export default function DisplayScreen({ state, isPreview }) {
             </ol>
           </div>
           <div className="speech-panel speech-timer">
-            <h1>タイマー</h1>
+            {currentSpeaker && (
+              <p className="speech-current-speaker">{currentSpeaker}</p>
+            )}
             {state.timerLabel?.trim() && (
               <p className="timer-label">{state.timerLabel}</p>
             )}
