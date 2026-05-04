@@ -5,6 +5,7 @@ export const defaultState = {
   titleText: "Model United Nations",
   agendaText: "議題を入力してください",
   timerLabel: "",
+  updatedAt: Date.now(),
   timer: {
     duration: 5 * 60 * 1000,
     remaining: 5 * 60 * 1000,
@@ -31,11 +32,17 @@ export const defaultState = {
 
 const STORAGE_KEY = "mun-state";
 
+const normalizeState = (state) => ({
+  ...defaultState,
+  ...state,
+  updatedAt: state?.updatedAt ?? Date.now()
+});
+
 export const loadState = () => {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (!stored) return defaultState;
-    return { ...defaultState, ...JSON.parse(stored) };
+    return normalizeState(JSON.parse(stored));
   } catch {
     return defaultState;
   }
@@ -43,19 +50,44 @@ export const loadState = () => {
 
 export const useSharedState = (isController) => {
   const [state, setState] = React.useState(loadState);
+  const stateRef = React.useRef(state);
+  const syncTimerRef = React.useRef(null);
+
+  React.useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
+
+  const setSyncedState = React.useCallback((updater) => {
+    setState((prev) => {
+      const next = typeof updater === "function" ? updater(prev) : updater;
+      const resolved = next && typeof next === "object" ? next : prev;
+      return {
+        ...resolved,
+        updatedAt: Date.now()
+      };
+    });
+  }, []);
 
   React.useEffect(() => {
     const channel = new BroadcastChannel("mun-channel");
     const handleMessage = (event) => {
       if (event.data?.type === "state") {
-        setState(event.data.state);
+        const incoming = normalizeState(event.data.state);
+        setState((prev) => {
+          if (incoming.updatedAt <= prev.updatedAt) return prev;
+          return incoming;
+        });
       }
     };
     channel.addEventListener("message", handleMessage);
 
     const handleStorage = (event) => {
       if (event.key === STORAGE_KEY && event.newValue) {
-        setState({ ...defaultState, ...JSON.parse(event.newValue) });
+        const incoming = normalizeState(JSON.parse(event.newValue));
+        setState((prev) => {
+          if (incoming.updatedAt <= prev.updatedAt) return prev;
+          return incoming;
+        });
       }
     };
     window.addEventListener("storage", handleStorage);
@@ -69,11 +101,25 @@ export const useSharedState = (isController) => {
 
   React.useEffect(() => {
     if (!isController) return;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    const channel = new BroadcastChannel("mun-channel");
-    channel.postMessage({ type: "state", state });
-    channel.close();
+
+    if (syncTimerRef.current) {
+      clearTimeout(syncTimerRef.current);
+    }
+
+    syncTimerRef.current = setTimeout(() => {
+      const snapshot = stateRef.current;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
+      const channel = new BroadcastChannel("mun-channel");
+      channel.postMessage({ type: "state", state: snapshot });
+      channel.close();
+    }, 120);
+
+    return () => {
+      if (syncTimerRef.current) {
+        clearTimeout(syncTimerRef.current);
+      }
+    };
   }, [state, isController]);
 
-  return [state, setState];
+  return [state, setSyncedState];
 };
