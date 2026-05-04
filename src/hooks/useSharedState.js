@@ -25,6 +25,7 @@ export const defaultState = {
     { id: "timer", label: "タイマー" },
     { id: "clock", label: "時計" },
     { id: "speakers", label: "発言リスト" },
+    { id: "speech", label: "スピーチ" },
     { id: "attendance", label: "出席リスト" },
     { id: "file", label: "資料" }
   ]

@@ -48,6 +48,26 @@ export default function DisplayScreen({ state, isPreview }) {
         </div>
       )}
 
+      {view === "speech" && (
+        <div className="speech-layout">
+          <div className="speech-panel">
+            <h1>発言リスト</h1>
+            <ol>
+              {state.speakers.map((speaker) => (
+                <li key={speaker.id}>{speaker.name}</li>
+              ))}
+            </ol>
+          </div>
+          <div className="speech-panel speech-timer">
+            <h1>タイマー</h1>
+            {state.timerLabel?.trim() && (
+              <p className="timer-label">{state.timerLabel}</p>
+            )}
+            <p className="clock-text">{formatDuration(state.timer.remaining)}</p>
+          </div>
+        </div>
+      )}
+
       {view === "attendance" && (
         <div className="screen-list">
           <h1>出席リスト</h1>
