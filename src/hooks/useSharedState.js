@@ -1,3 +1,5 @@
+import React from "react";
+
 export const defaultState = {
   currentView: "title",
   titleText: "Model United Nations",
