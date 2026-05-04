@@ -27,7 +27,7 @@ export const defaultState = {
     { id: "speakers", label: "発言リスト" },
     { id: "speech", label: "スピーチ" },
     { id: "share", label: "アプリ画面" },
-    { id: "attendance", label: "出席リスト" },
+    { id: "attendance", label: "国リスト" },
     { id: "file", label: "資料" }
   ]
 };

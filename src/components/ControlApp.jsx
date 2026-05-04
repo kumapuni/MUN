@@ -14,6 +14,9 @@ import {
   saveFile
 } from "../utils/fileStore.js";
 
+const ATTENDANCE_PRESENT = "present";
+const ATTENDANCE_ABSENT = "absent";
+
 export default function ControlApp() {
   const [state, setState] = useSharedState(true);
   const [speakerName, setSpeakerName] = useState("");
@@ -93,7 +96,12 @@ export default function ControlApp() {
     if (!attendanceName.trim()) return;
     setState((prev) => ({
       ...prev,
-      attendance: [...prev.attendance, createListItem(attendanceName.trim())]
+      attendance: [
+        ...prev.attendance,
+        createListItem(attendanceName.trim(), {
+          status: ATTENDANCE_ABSENT
+        })
+      ]
     }));
     setAttendanceName("");
   };
@@ -123,6 +131,15 @@ export default function ControlApp() {
     setState((prev) => ({
       ...prev,
       attendance: prev.attendance.filter((item) => item.id !== id)
+    }));
+  };
+
+  const handleAttendanceStatus = (id, status) => {
+    setState((prev) => ({
+      ...prev,
+      attendance: prev.attendance.map((item) =>
+        item.id === id ? { ...item, status } : item
+      )
     }));
   };
 
@@ -194,6 +211,23 @@ export default function ControlApp() {
     const remaining = updateTimerState(state.timer).remaining;
     return formatDuration(remaining);
   }, [state.timer]);
+
+  const attendanceStats = useMemo(() => {
+    const total = state.attendance.length;
+    const present = state.attendance.filter(
+      (item) => item.status === ATTENDANCE_PRESENT
+    ).length;
+    const rate = total ? Math.round((present / total) * 100) : 0;
+    const majority = total ? Math.floor(total / 2) + 1 : 0;
+    const twoThirds = total ? Math.ceil((total * 2) / 3) : 0;
+    return {
+      total,
+      present,
+      rate,
+      majority,
+      twoThirds
+    };
+  }, [state.attendance]);
 
   const previewState = useMemo(() => {
     return {
@@ -358,7 +392,7 @@ export default function ControlApp() {
         </section>
 
         <section className="panel-section">
-          <h2>出席リスト</h2>
+          <h2>国リスト</h2>
           <div className="list-row">
             <input
               className="text-input"
@@ -370,16 +404,22 @@ export default function ControlApp() {
                   addAttendance();
                 }
               }}
-              placeholder="出席者名を入力"
+              placeholder="国名を入力"
             />
             <button className="secondary" onClick={addAttendance}>
               追加
             </button>
           </div>
+          <div className="attendance-stats">
+            <div>出席: {attendanceStats.present} / {attendanceStats.total} ({attendanceStats.rate}%)</div>
+            <div>過半数: {attendanceStats.majority}</div>
+            <div>3分の2: {attendanceStats.twoThirds}</div>
+          </div>
           <ul className="draggable-list">
             {state.attendance.map((member) => (
               <li
                 key={member.id}
+                className={`attendance-item ${member.status || ATTENDANCE_ABSENT}`}
                 draggable
                 onDragStart={(event) =>
                   event.dataTransfer.setData("text/plain", member.id)
@@ -391,12 +431,30 @@ export default function ControlApp() {
                 }}
               >
                 <span>{member.name}</span>
-                <button
-                  className="ghost"
-                  onClick={() => handleAttendanceRemove(member.id)}
-                >
-                  削除
-                </button>
+                <div className="attendance-actions">
+                  <button
+                    className={
+                      member.status === ATTENDANCE_PRESENT ? "accent" : "secondary"
+                    }
+                    onClick={() => handleAttendanceStatus(member.id, ATTENDANCE_PRESENT)}
+                  >
+                    出席
+                  </button>
+                  <button
+                    className={
+                      member.status === ATTENDANCE_ABSENT ? "accent" : "secondary"
+                    }
+                    onClick={() => handleAttendanceStatus(member.id, ATTENDANCE_ABSENT)}
+                  >
+                    欠席
+                  </button>
+                  <button
+                    className="ghost"
+                    onClick={() => handleAttendanceRemove(member.id)}
+                  >
+                    削除
+                  </button>
+                </div>
               </li>
             ))}
           </ul>

@@ -1,5 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { formatDuration } from "../utils/stateUtils.js";
+
+const ATTENDANCE_PRESENT = "present";
+
+const formatRate = (present, total) => {
+  if (!total) return "0%";
+  return `${Math.round((present / total) * 100)}%`;
+};
 
 export default function DisplayScreen({ state, isPreview }) {
   const view = state.currentView;
@@ -53,6 +60,22 @@ export default function DisplayScreen({ state, isPreview }) {
   }, [shareStream]);
 
   useEffect(() => () => stopShare(), []);
+
+  const attendanceStats = useMemo(() => {
+    const total = state.attendance.length;
+    const present = state.attendance.filter(
+      (item) => item.status === ATTENDANCE_PRESENT
+    ).length;
+    const majority = total ? Math.floor(total / 2) + 1 : 0;
+    const twoThirds = total ? Math.ceil((total * 2) / 3) : 0;
+    return {
+      total,
+      present,
+      majority,
+      twoThirds,
+      rate: formatRate(present, total)
+    };
+  }, [state.attendance]);
 
   return (
     <div className={screenClass}>
@@ -157,10 +180,29 @@ export default function DisplayScreen({ state, isPreview }) {
 
       {view === "attendance" && (
         <div className="screen-list">
-          <h1>出席リスト</h1>
+          <div className="attendance-header">
+            <h1>国リスト</h1>
+            <div className="attendance-summary">
+              <div>出席: {attendanceStats.present} / {attendanceStats.total} ({attendanceStats.rate})</div>
+              <div>過半数: {attendanceStats.majority}</div>
+              <div>3分の2: {attendanceStats.twoThirds}</div>
+            </div>
+          </div>
           <ol>
             {state.attendance.map((member) => (
-              <li key={member.id}>{member.name}</li>
+              <li
+                key={member.id}
+                className={
+                  member.status === ATTENDANCE_PRESENT
+                    ? "attendance-present"
+                    : "attendance-absent"
+                }
+              >
+                <span>{member.name}</span>
+                <span className="attendance-status">
+                  {member.status === ATTENDANCE_PRESENT ? "出席" : "欠席"}
+                </span>
+              </li>
             ))}
           </ol>
         </div>

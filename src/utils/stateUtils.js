@@ -1,6 +1,7 @@
-export const createListItem = (name) => ({
+export const createListItem = (name, extra = {}) => ({
   id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
-  name
+  name,
+  ...extra
 });
 
 export const moveItem = (items, fromId, toId) => {
