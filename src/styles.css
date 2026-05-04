@@ -209,7 +209,7 @@ button.ghost {
 }
 
 .clock-text {
-  font-size: clamp(96px, 12vw, 150px);
+  font-size: clamp(180px, 24vw, 450px);
   font-weight: 700;
   margin: 0;
   line-height: 1;
@@ -272,7 +272,7 @@ button.ghost {
 }
 
 .speech-timer .clock-text {
-  font-size: clamp(88px, 11vw, 140px);
+  font-size: clamp(170px, 22vw, 420px);
 }
 
 .screen-file {
