@@ -405,7 +405,7 @@ export default function ControlApp() {
         <section className="panel-section">
           <h2>資料ファイル</h2>
           <p className="helper">
-            PPTX/XLSXはブラウザの対応状況によっては表示できない場合があります。可能ならPDFを推奨します。
+            PDFまたは画像のみ対応しています（PPTXは非対応です）。
           </p>
           <p className="helper">
             ブラウザ保存容量の上限があるため、目安として50MB以下でアップロードしてください。
@@ -413,7 +413,7 @@ export default function ControlApp() {
           <input
             type="file"
             className="file-input"
-            accept=".pdf,.ppt,.pptx,.xls,.xlsx,.csv,.png,.jpg,.jpeg"
+            accept=".pdf,.png,.jpg,.jpeg"
             onChange={handleFileChange}
           />
           {state.fileView?.name && (
