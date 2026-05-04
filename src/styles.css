@@ -203,13 +203,13 @@ button.ghost {
 
 .timer-label {
   font-size: 144px;
-  margin: 8px 0 8px;
+  margin: 16px 0 16px;
   font-weight: 600;
 }
 
 .clock-text {
-  font-size: 360px;
-  font-weight: 500;
+  font-size: 300px;
+  font-weight: 700;
 }
 
 .screen-list {
