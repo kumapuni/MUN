@@ -6,7 +6,8 @@ export const createListItem = (name) => ({
 export const createCountryItem = (name) => ({
   id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
   name,
-  status: "pending"
+  status: "pending",
+  vote: ""
 });
 
 export const moveItem = (items, fromId, toId) => {

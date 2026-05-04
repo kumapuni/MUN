@@ -4,6 +4,7 @@ export default function DisplayScreen({ state, isPreview }) {
   const view = state.currentView;
 
   const screenClass = isPreview ? "screen preview" : "screen";
+  const currentSpeaker = state.speakers?.[0]?.name;
   const attendanceTotal = state.attendance.length;
   const attendancePresent = state.attendance.filter(
     (member) => member.status === "present"
@@ -72,7 +73,9 @@ export default function DisplayScreen({ state, isPreview }) {
             </ol>
           </div>
           <div className="speech-panel speech-timer">
-            <h1>タイマー</h1>
+            {currentSpeaker && (
+              <p className="speech-current-speaker">{currentSpeaker}</p>
+            )}
             {state.timerLabel?.trim() && (
               <p className="timer-label">{state.timerLabel}</p>
             )}
@@ -102,6 +105,42 @@ export default function DisplayScreen({ state, isPreview }) {
               </li>
             ))}
           </ol>
+        </div>
+      )}
+
+      {view === "vote" && (
+        <div className="screen-list">
+          <h1>ロールコール投票</h1>
+          <div className="vote-table-wrapper">
+            <table className="vote-table">
+              <thead>
+                <tr>
+                  <th>国名</th>
+                  <th>賛成</th>
+                  <th>反対</th>
+                  <th>棄権</th>
+                </tr>
+              </thead>
+              <tbody>
+                {state.attendance.map((member) => (
+                  <tr key={member.id}>
+                    <td>{member.name}</td>
+                    <td className={member.vote === "yes" ? "vote-mark" : ""}>
+                      {member.vote === "yes" ? "●" : ""}
+                    </td>
+                    <td className={member.vote === "no" ? "vote-mark" : ""}>
+                      {member.vote === "no" ? "●" : ""}
+                    </td>
+                    <td
+                      className={member.vote === "abstain" ? "vote-mark" : ""}
+                    >
+                      {member.vote === "abstain" ? "●" : ""}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 

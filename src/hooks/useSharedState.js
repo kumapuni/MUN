@@ -28,6 +28,7 @@ export const defaultState = {
     { id: "speech", label: "スピーチ" },
     { id: "share", label: "アプリ画面" },
     { id: "attendance", label: "国リスト" },
+    { id: "vote", label: "投票" },
     { id: "file", label: "資料" }
   ]
 };

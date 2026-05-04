@@ -129,6 +129,15 @@ export default function ControlApp() {
     }));
   };
 
+  const handleVoteStatus = (id, vote) => {
+    setState((prev) => ({
+      ...prev,
+      attendance: prev.attendance.map((item) =>
+        item.id === id ? { ...item, vote } : item
+      )
+    }));
+  };
+
   const handleAttendanceRemove = (id) => {
     setState((prev) => ({
       ...prev,
@@ -460,6 +469,50 @@ export default function ControlApp() {
                     onClick={() => handleAttendanceRemove(member.id)}
                   >
                     削除
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section className="panel-section">
+          <h2>ロールコール投票</h2>
+          <p className="helper">国ごとに投票結果を記録します。</p>
+          <ul className="draggable-list">
+            {state.attendance.map((member) => (
+              <li key={member.id}>
+                <span>{member.name}</span>
+                <div className="list-actions">
+                  <button
+                    className={`vote-button yes ${
+                      member.vote === "yes" ? "active" : ""
+                    }`}
+                    onClick={() => handleVoteStatus(member.id, "yes")}
+                  >
+                    賛成
+                  </button>
+                  <button
+                    className={`vote-button no ${
+                      member.vote === "no" ? "active" : ""
+                    }`}
+                    onClick={() => handleVoteStatus(member.id, "no")}
+                  >
+                    反対
+                  </button>
+                  <button
+                    className={`vote-button abstain ${
+                      member.vote === "abstain" ? "active" : ""
+                    }`}
+                    onClick={() => handleVoteStatus(member.id, "abstain")}
+                  >
+                    棄権
+                  </button>
+                  <button
+                    className="ghost"
+                    onClick={() => handleVoteStatus(member.id, "")}
+                  >
+                    クリア
                   </button>
                 </div>
               </li>
