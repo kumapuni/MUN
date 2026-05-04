@@ -173,8 +173,8 @@ button.ghost {
   height: 100%;
   min-height: 70vh;
   background: #0b1120;
-  border-radius: 16px;
-  padding: 32px;
+  border-radius: 32px;
+  padding: 64px;
   color: #f8fafc;
 }
 
@@ -192,24 +192,24 @@ button.ghost {
 }
 
 .screen-center h1 {
-  font-size: 54px;
-  margin-bottom: 16px;
+  font-size: 108px;
+  margin-bottom: 32px;
 }
 
 .large-text {
-  font-size: 44px;
+  font-size: 88px;
   white-space: pre-wrap;
 }
 
 .timer-label {
-  font-size: 72px;
-  margin: 8px 0 16px;
+  font-size: 144px;
+  margin: 8px 0 8px;
   font-weight: 600;
 }
 
 .clock-text {
   font-size: 360px;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .screen-list {
