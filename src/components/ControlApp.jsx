@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import DisplayScreen from "./DisplayScreen.jsx";
 import { defaultState, useSharedState } from "../hooks/useSharedState.js";
 import {
+  createCountryItem,
   createListItem,
   formatDuration,
   moveItem,
@@ -13,9 +14,6 @@ import {
   removeFile,
   saveFile
 } from "../utils/fileStore.js";
-
-const ATTENDANCE_PRESENT = "present";
-const ATTENDANCE_ABSENT = "absent";
 
 export default function ControlApp() {
   const [state, setState] = useSharedState(true);
@@ -96,12 +94,7 @@ export default function ControlApp() {
     if (!attendanceName.trim()) return;
     setState((prev) => ({
       ...prev,
-      attendance: [
-        ...prev.attendance,
-        createListItem(attendanceName.trim(), {
-          status: ATTENDANCE_ABSENT
-        })
-      ]
+      attendance: [...prev.attendance, createCountryItem(attendanceName.trim())]
     }));
     setAttendanceName("");
   };
@@ -127,19 +120,19 @@ export default function ControlApp() {
     }));
   };
 
-  const handleAttendanceRemove = (id) => {
-    setState((prev) => ({
-      ...prev,
-      attendance: prev.attendance.filter((item) => item.id !== id)
-    }));
-  };
-
   const handleAttendanceStatus = (id, status) => {
     setState((prev) => ({
       ...prev,
       attendance: prev.attendance.map((item) =>
         item.id === id ? { ...item, status } : item
       )
+    }));
+  };
+
+  const handleAttendanceRemove = (id) => {
+    setState((prev) => ({
+      ...prev,
+      attendance: prev.attendance.filter((item) => item.id !== id)
     }));
   };
 
@@ -212,22 +205,19 @@ export default function ControlApp() {
     return formatDuration(remaining);
   }, [state.timer]);
 
-  const attendanceStats = useMemo(() => {
-    const total = state.attendance.length;
-    const present = state.attendance.filter(
-      (item) => item.status === ATTENDANCE_PRESENT
-    ).length;
-    const rate = total ? Math.round((present / total) * 100) : 0;
-    const majority = total ? Math.floor(total / 2) + 1 : 0;
-    const twoThirds = total ? Math.ceil((total * 2) / 3) : 0;
-    return {
-      total,
-      present,
-      rate,
-      majority,
-      twoThirds
-    };
-  }, [state.attendance]);
+  const attendanceTotal = state.attendance.length;
+  const attendancePresent = state.attendance.filter(
+    (member) => member.status === "present"
+  ).length;
+  const attendanceRate = attendanceTotal
+    ? Math.round((attendancePresent / attendanceTotal) * 100)
+    : 0;
+  const attendanceMajority = attendancePresent
+    ? Math.floor(attendancePresent / 2) + 1
+    : 0;
+  const attendanceTwoThirds = attendancePresent
+    ? Math.ceil((attendancePresent * 2) / 3)
+    : 0;
 
   const previewState = useMemo(() => {
     return {
@@ -411,15 +401,15 @@ export default function ControlApp() {
             </button>
           </div>
           <div className="attendance-stats">
-            <div>出席: {attendanceStats.present} / {attendanceStats.total} ({attendanceStats.rate}%)</div>
-            <div>過半数: {attendanceStats.majority}</div>
-            <div>3分の2: {attendanceStats.twoThirds}</div>
+            <div>出席数: {attendancePresent} / {attendanceTotal}</div>
+            <div>出席率: {attendanceRate}%</div>
+            <div>過半数: {attendanceMajority}</div>
+            <div>出席数の3分の2: {attendanceTwoThirds}</div>
           </div>
           <ul className="draggable-list">
             {state.attendance.map((member) => (
               <li
                 key={member.id}
-                className={`attendance-item ${member.status || ATTENDANCE_ABSENT}`}
                 draggable
                 onDragStart={(event) =>
                   event.dataTransfer.setData("text/plain", member.id)
@@ -430,21 +420,30 @@ export default function ControlApp() {
                   handleAttendanceDrop(fromId, member.id);
                 }}
               >
-                <span>{member.name}</span>
-                <div className="attendance-actions">
+                <span>
+                  {member.name}
+                  <span className="status-tag">
+                    {member.status === "present"
+                      ? "出席"
+                      : member.status === "absent"
+                        ? "欠席"
+                        : "未定"}
+                  </span>
+                </span>
+                <div className="list-actions">
                   <button
                     className={
-                      member.status === ATTENDANCE_PRESENT ? "accent" : "secondary"
+                      member.status === "present" ? "accent" : "secondary"
                     }
-                    onClick={() => handleAttendanceStatus(member.id, ATTENDANCE_PRESENT)}
+                    onClick={() => handleAttendanceStatus(member.id, "present")}
                   >
                     出席
                   </button>
                   <button
                     className={
-                      member.status === ATTENDANCE_ABSENT ? "accent" : "secondary"
+                      member.status === "absent" ? "accent" : "secondary"
                     }
-                    onClick={() => handleAttendanceStatus(member.id, ATTENDANCE_ABSENT)}
+                    onClick={() => handleAttendanceStatus(member.id, "absent")}
                   >
                     欠席
                   </button>
