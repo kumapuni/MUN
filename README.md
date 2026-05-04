@@ -1,21 +1,7 @@
 # MUN
+
 模擬国連用ソフトです
 
-## 使い方
-
-### 開発モード
-
-```bash
-npm install
-npm run dev
-```
-
-### 本番ビルド
-
-```bash
-npm run build
-npm run preview
-```
 
 ### 表示画面の開き方
 
@@ -28,4 +14,4 @@ npm run preview
 
 ### 資料ファイル
 
-- PPTX/XLSXはブラウザ環境によっては表示できません。PDF形式の資料が推奨です。
+表示されないこともあります。
