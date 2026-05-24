@@ -14,6 +14,7 @@ export const defaultState = {
   },
   speakers: [],
   attendance: [],
+  motions: [],
   fileView: {
     id: "",
     name: "",
@@ -29,6 +30,7 @@ export const defaultState = {
     { id: "share", label: "アプリ画面" },
     { id: "attendance", label: "国リスト" },
     { id: "vote", label: "投票" },
+    { id: "motion", label: "動議" },
     { id: "file", label: "資料" }
   ]
 };
@@ -38,6 +40,7 @@ const STORAGE_KEY = "mun-state";
 const normalizeState = (state) => ({
   ...defaultState,
   ...state,
+  motions: state?.motions ?? [],
   fileView: {
     ...defaultState.fileView,
     ...(state?.fileView ?? {}),
@@ -81,10 +84,7 @@ export const useSharedState = (isController) => {
     const handleMessage = (event) => {
       if (event.data?.type === "state") {
         const incoming = normalizeState(event.data.state);
-        setState((prev) => {
-          if (incoming.updatedAt <= prev.updatedAt) return prev;
-          return incoming;
-        });
+        setState((prev) => (incoming.updatedAt <= prev.updatedAt ? prev : incoming));
       }
     };
     channel.addEventListener("message", handleMessage);
@@ -92,10 +92,7 @@ export const useSharedState = (isController) => {
     const handleStorage = (event) => {
       if (event.key === STORAGE_KEY && event.newValue) {
         const incoming = normalizeState(JSON.parse(event.newValue));
-        setState((prev) => {
-          if (incoming.updatedAt <= prev.updatedAt) return prev;
-          return incoming;
-        });
+        setState((prev) => (incoming.updatedAt <= prev.updatedAt ? prev : incoming));
       }
     };
     window.addEventListener("storage", handleStorage);
