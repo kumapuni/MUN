@@ -16,12 +16,12 @@ body {
 
 .app-layout {
   display: grid;
-  grid-template-columns: 420px 1fr;
+  grid-template-columns: 1.2fr 0.8fr;
   min-height: 100vh;
 }
 
 .control-panel {
-  padding: 24px;
+  padding: 16px;
   border-right: 1px solid rgba(148, 163, 184, 0.2);
   background: #111827;
 }
@@ -31,21 +31,21 @@ body {
   justify-content: space-between;
   align-items: center;
   gap: 16px;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
 .panel-section {
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
 .panel-section h2 {
-  margin: 0 0 12px;
+  margin: 0 0 10px;
   font-size: 18px;
 }
 
 .button-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
 }
 
@@ -57,25 +57,61 @@ button {
   font-weight: 600;
 }
 
-button.primary {
-  background: #2563eb;
-  color: white;
-}
+button.primary { background: #2563eb; color: white; }
+button.secondary { background: #1f2937; color: #e2e8f0; }
+button.accent { background: #38bdf8; color: #0f172a; }
+button.ghost { background: transparent; color: #cbd5f5; }
 
-button.secondary {
-  background: #1f2937;
+.text-input, .text-area {
+  width: 100%;
+  background: #0f172a;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  border-radius: 10px;
+  padding: 10px;
   color: #e2e8f0;
 }
 
-button.accent {
-  background: #38bdf8;
-  color: #0f172a;
+.text-area { resize: vertical; }
+
+.timer-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+.timer-row label { flex: 1; }
+.timer-preview { font-size: 20px; font-weight: 700; }
+.list-row { display: flex; gap: 8px; margin-bottom: 12px; }
+
+.draggable-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 8px;
 }
 
-button.ghost {
-  background: transparent;
+.draggable-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background: #0f172a;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 10px;
+  gap: 12px;
+}
+
+.list-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.status-tag {
+  margin-left: 8px;
+  font-size: 12px;
   color: #cbd5f5;
 }
+
+.status-tag.present { color: #22c55e; }
+.status-tag.absent { color: #f87171; }
 
 .status-button {
   border-radius: 999px;
@@ -139,80 +175,14 @@ button.ghost {
   color: #422006;
 }
 
-.text-input,
-.text-area {
-  width: 100%;
-  background: #0f172a;
-  border: 1px solid rgba(148, 163, 184, 0.4);
-  border-radius: 10px;
-  padding: 10px;
+.vote-button.absent {
+  background: rgba(148, 163, 184, 0.2);
   color: #e2e8f0;
 }
 
-.text-area {
-  resize: vertical;
-}
-
-.timer-row {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.timer-row label {
-  flex: 1;
-}
-
-.timer-preview {
-  font-size: 20px;
-  font-weight: 700;
-}
-
-.list-row {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.draggable-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: grid;
-  gap: 8px;
-}
-
-.draggable-list li {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 12px;
-  background: #0f172a;
-  border: 1px solid rgba(148, 163, 184, 0.3);
-  border-radius: 10px;
-  gap: 12px;
-}
-
-.list-actions {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-}
-
-.status-tag {
-  margin-left: 8px;
-  font-size: 12px;
-  color: #cbd5f5;
-}
-
-.status-tag.present {
-  color: #22c55e;
-}
-
-.status-tag.absent {
-  color: #f87171;
+.vote-button.absent.active {
+  background: #64748b;
+  color: #0f172a;
 }
 
 .attendance-stats {
@@ -228,30 +198,32 @@ button.ghost {
   color: #e2e8f0;
 }
 
-.country-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px 24px;
-  list-style-position: inside;
-}
-
-.country-list li {
-  width: calc(50% - 12px);
-}
-
-.vote-table-wrapper {
+.motion-table-wrap, .vote-table-wrapper {
   overflow-x: auto;
+  margin-top: 10px;
+}
+
+.motion-table, .vote-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.motion-table th, .motion-table td,
+.vote-table th, .vote-table td {
+  border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+  padding: 8px;
+}
+
+.motion-table.display-motion {
+  font-size: clamp(16px, 2vw, 22px);
 }
 
 .vote-table {
-  width: 100%;
-  border-collapse: collapse;
   font-size: clamp(18px, 2.4vw, 24px);
 }
 
 .vote-table th,
 .vote-table td {
-  border-bottom: 1px solid rgba(148, 163, 184, 0.25);
   padding: 12px 16px;
   text-align: center;
 }
@@ -287,34 +259,34 @@ button.ghost {
 }
 
 .preview-panel {
-  padding: 24px;
+  padding: 12px;
   background: #0b1120;
 }
 
 .preview-header {
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .preview-screen {
   background: #0f172a;
   border-radius: 20px;
   border: 1px solid rgba(148, 163, 184, 0.2);
-  padding: 16px;
-  min-height: 80vh;
+  padding: 12px;
+  min-height: 45vh;
 }
 
 .screen {
   width: 100%;
   height: 100%;
-  min-height: 70vh;
+  min-height: 45vh;
   background: #0b1120;
   border-radius: 16px;
-  padding: 32px;
+  padding: 20px;
   color: #f8fafc;
 }
 
 .screen.preview {
-  min-height: 60vh;
+  min-height: 35vh;
 }
 
 .screen-center {
@@ -324,27 +296,27 @@ button.ghost {
   align-items: center;
   justify-content: center;
   text-align: center;
-  gap: clamp(12px, 2vh, 20px);
+  gap: 12px;
 }
 
 .screen-center h1 {
-  font-size: clamp(32px, 4vw, 54px);
+  font-size: clamp(28px, 4vw, 46px);
   margin: 0;
 }
 
 .large-text {
-  font-size: clamp(28px, 3.2vw, 44px);
+  font-size: clamp(24px, 3vw, 36px);
   white-space: pre-wrap;
 }
 
 .timer-label {
-  font-size: clamp(24px, 3vw, 36px);
+  font-size: clamp(20px, 2.5vw, 30px);
   margin: 0;
   font-weight: 600;
 }
 
 .clock-text {
-  font-size: clamp(180px, 24vw, 450px);
+  font-size: clamp(100px, 18vw, 260px);
   font-weight: 700;
   margin: 0;
   line-height: 1;
@@ -353,16 +325,16 @@ button.ghost {
 .screen-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .screen-list h1 {
   margin: 0;
-  font-size: clamp(32px, 4vw, 42px);
+  font-size: clamp(28px, 4vw, 38px);
 }
 
 .screen-list ol {
-  font-size: clamp(24px, 3vw, 34px);
+  font-size: clamp(18px, 2.4vw, 28px);
   margin: 0;
   padding-left: 24px;
 }
@@ -370,24 +342,24 @@ button.ghost {
 .speech-layout {
   display: grid;
   grid-template-columns: 1.1fr 0.9fr;
-  gap: clamp(16px, 4vw, 36px);
+  gap: 16px;
   height: 100%;
 }
 
 .speech-panel {
   display: flex;
   flex-direction: column;
-  gap: clamp(10px, 2vw, 18px);
+  gap: 12px;
   min-height: 0;
 }
 
 .speech-panel h1 {
   margin: 0;
-  font-size: clamp(32px, 4vw, 42px);
+  font-size: clamp(28px, 4vw, 38px);
 }
 
 .speech-panel ol {
-  font-size: clamp(24px, 3vw, 34px);
+  font-size: clamp(18px, 2.4vw, 28px);
   margin: 0;
   padding-left: 1.4em;
   list-style-position: inside;
@@ -395,7 +367,7 @@ button.ghost {
 }
 
 .speech-current-speaker {
-  font-size: clamp(32px, 4vw, 48px);
+  font-size: clamp(24px, 3vw, 36px);
   font-weight: 700;
   margin: 0;
 }
@@ -407,31 +379,25 @@ button.ghost {
 }
 
 .speech-timer .clock-text {
-  font-size: clamp(170px, 22vw, 420px);
+  font-size: clamp(100px, 16vw, 220px);
 }
 
 .screen-share {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 12px;
   height: 100%;
 }
 
 .share-controls {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .share-controls h1 {
   margin: 0;
-  font-size: clamp(28px, 4vw, 42px);
-}
-
-.share-buttons {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
+  font-size: clamp(24px, 3vw, 36px);
 }
 
 .share-video-frame {
@@ -445,23 +411,16 @@ button.ghost {
   justify-content: center;
 }
 
-.share-video {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  border-radius: 12px;
-}
-
 .screen-file {
   height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .file-frame {
   width: 100%;
-  height: 70vh;
+  height: 50vh;
   border: none;
   border-radius: 12px;
   background: white;
@@ -471,7 +430,18 @@ button.ghost {
   width: 100vw;
   height: 100vh;
   background: #0b1120;
-  padding: 24px;
+  padding: 12px;
+}
+
+.country-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  list-style-position: inside;
+}
+
+.country-list li {
+  width: calc(50% - 10px);
 }
 
 @media (max-width: 1024px) {
@@ -481,5 +451,9 @@ button.ghost {
 
   .country-list li {
     width: 100%;
+  }
+
+  .button-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
