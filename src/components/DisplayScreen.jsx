@@ -2,7 +2,6 @@ import { formatDuration } from "../utils/stateUtils.js";
 
 export default function DisplayScreen({ state, isPreview }) {
   const view = state.currentView;
-  const screenClass = isPreview ? "screen preview" : "screen";
   const currentSpeaker = state.speakers?.[0]?.name;
   const attendanceTotal = state.attendance.length;
   const attendancePresent = state.attendance.filter(
@@ -29,7 +28,7 @@ export default function DisplayScreen({ state, isPreview }) {
   );
 
   return (
-    <div className={screenClass}>
+    <div className={isPreview ? "screen preview" : "screen"}>
       {view === "title" && (
         <div className="screen-center">
           <h1>{state.titleText}</h1>
@@ -53,7 +52,9 @@ export default function DisplayScreen({ state, isPreview }) {
       {view === "timer" && (
         <div className="screen-center">
           <h1>タイマー1</h1>
-          {state.timerLabel?.trim() && <p className="timer-label">{state.timerLabel}</p>}
+          {state.timerLabel?.trim() && (
+            <p className="timer-label">{state.timerLabel}</p>
+          )}
           <p className="clock-text">{formatDuration(state.timer.remaining)}</p>
         </div>
       )}
@@ -80,24 +81,14 @@ export default function DisplayScreen({ state, isPreview }) {
             </ol>
           </div>
           <div className="speech-panel speech-timer">
-            {currentSpeaker && <p className="speech-current-speaker">{currentSpeaker}</p>}
-            {state.timerLabel?.trim() && <p className="timer-label">{state.timerLabel}</p>}
+            {currentSpeaker && (
+              <p className="speech-current-speaker">{currentSpeaker}</p>
+            )}
+            {state.timerLabel?.trim() && (
+              <p className="timer-label">{state.timerLabel}</p>
+            )}
             <p className="clock-text">{formatDuration(state.timer.remaining)}</p>
           </div>
-        </div>
-      )}
-
-      {view === "share" && (
-        <div className="screen-share">
-          <div className="share-controls">
-            <h1>アプリ画面共有</h1>
-            {isPreview ? <p className="helper">表示画面側で「共有開始」を押してください。</p> : null}
-          </div>
-          {!isPreview && (
-            <div className="share-video-frame">
-              <p className="helper">共有を開始するとここに映ります。</p>
-            </div>
-          )}
         </div>
       )}
 
@@ -149,10 +140,18 @@ export default function DisplayScreen({ state, isPreview }) {
                 {state.attendance.map((member) => (
                   <tr key={member.id}>
                     <td>{member.name}</td>
-                    <td className={member.vote === "yes" ? "vote-mark" : ""}>{member.vote === "yes" ? "●" : ""}</td>
-                    <td className={member.vote === "no" ? "vote-mark" : ""}>{member.vote === "no" ? "●" : ""}</td>
-                    <td className={member.vote === "abstain" ? "vote-mark" : ""}>{member.vote === "abstain" ? "●" : ""}</td>
-                    <td className={member.vote === "absent" ? "vote-mark" : ""}>{member.vote === "absent" ? "●" : ""}</td>
+                    <td className={member.vote === "yes" ? "vote-mark" : ""}>
+                      {member.vote === "yes" ? "●" : ""}
+                    </td>
+                    <td className={member.vote === "no" ? "vote-mark" : ""}>
+                      {member.vote === "no" ? "●" : ""}
+                    </td>
+                    <td className={member.vote === "abstain" ? "vote-mark" : ""}>
+                      {member.vote === "abstain" ? "●" : ""}
+                    </td>
+                    <td className={member.vote === "absent" ? "vote-mark" : ""}>
+                      {member.vote === "absent" ? "●" : ""}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -164,7 +163,7 @@ export default function DisplayScreen({ state, isPreview }) {
       {view === "motion" && (
         <div className="screen-list">
           <h1>動議</h1>
-          <div className="vote-table-wrapper">
+          <div className="motion-table-wrap">
             <table className="motion-table display-motion">
               <thead>
                 <tr>
@@ -193,10 +192,35 @@ export default function DisplayScreen({ state, isPreview }) {
         <div className="screen-file">
           <h1>資料表示</h1>
           {state.fileView?.dataUrl ? (
-            <iframe title="document" src={state.fileView.dataUrl} className="file-frame" />
+            <iframe
+              title="document"
+              src={state.fileView.dataUrl}
+              className="file-frame"
+            />
           ) : (
             <p className="helper">操作画面でファイルを読み込んでください。</p>
           )}
+        </div>
+      )}
+
+      {view === "share" && (
+        <div className="screen-share">
+          <div className="share-controls">
+            <h1>表示ウィンドウ</h1>
+            <p className="helper">
+              操作画面の「表示ウィンドウを開く」から接続してください。
+            </p>
+          </div>
+          <div className="share-video-frame">
+            <p className="helper">
+              接続待ちです。表示ウィンドウが開かれるとここに同期内容が表示されます。
+            </p>
+          </div>
+          {isPreview ? (
+            <p className="helper">
+              プレビュー表示中です。実際の表示ウィンドウを開くと同期されます。
+            </p>
+          ) : null}
         </div>
       )}
     </div>
