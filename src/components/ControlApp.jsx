@@ -4,6 +4,7 @@ import { defaultState, useSharedState } from "../hooks/useSharedState.js";
 import {
   createCountryItem,
   createListItem,
+  createMotionItem,
   formatDuration,
   moveItem,
   updateTimerState,
@@ -14,6 +15,8 @@ import {
   removeFile,
   saveFile
 } from "../utils/fileStore.js";
+
+const AVAILABLE_VIEWS = defaultState.availableViews;
 
 export default function ControlApp() {
   const [state, setState] = useSharedState(true);
@@ -99,6 +102,29 @@ export default function ControlApp() {
     setAttendanceName("");
   };
 
+  const addMotion = () => {
+    setState((prev) => ({
+      ...prev,
+      motions: [...(prev.motions ?? []), createMotionItem()]
+    }));
+  };
+
+  const updateMotion = (id, updates) => {
+    setState((prev) => ({
+      ...prev,
+      motions: (prev.motions ?? []).map((motion) =>
+        motion.id === id ? { ...motion, ...updates } : motion
+      )
+    }));
+  };
+
+  const removeMotion = (id) => {
+    setState((prev) => ({
+      ...prev,
+      motions: (prev.motions ?? []).filter((motion) => motion.id !== id)
+    }));
+  };
+
   const handleSpeakerDrop = (fromId, toId) => {
     setState((prev) => ({
       ...prev,
@@ -135,13 +161,6 @@ export default function ControlApp() {
       attendance: prev.attendance.map((item) =>
         item.id === id ? { ...item, vote } : item
       )
-    }));
-  };
-
-  const handleAttendanceRemove = (id) => {
-    setState((prev) => ({
-      ...prev,
-      attendance: prev.attendance.filter((item) => item.id !== id)
     }));
   };
 
@@ -254,7 +273,7 @@ export default function ControlApp() {
         <section className="panel-section">
           <h2>画面切り替え</h2>
           <div className="button-grid">
-            {defaultState.availableViews.map((view) => (
+            {AVAILABLE_VIEWS.map((view) => (
               <button
                 key={view.id}
                 className={
@@ -288,7 +307,7 @@ export default function ControlApp() {
         </section>
 
         <section className="panel-section">
-          <h2>タイマー</h2>
+          <h2>タイマー 1</h2>
           <div className="timer-row">
             <label>
               分数
@@ -329,16 +348,10 @@ export default function ControlApp() {
             </button>
           </div>
           <div className="timer-row">
-            <button
-              className="secondary"
-              onClick={() => handleTimerExtend(30)}
-            >
+            <button className="secondary" onClick={() => handleTimerExtend(30)}>
               +30秒
             </button>
-            <button
-              className="secondary"
-              onClick={() => handleTimerExtend(60)}
-            >
+            <button className="secondary" onClick={() => handleTimerExtend(60)}>
               +1分
             </button>
           </div>
@@ -379,10 +392,7 @@ export default function ControlApp() {
                 }}
               >
                 <span>{speaker.name}</span>
-                <button
-                  className="ghost"
-                  onClick={() => handleSpeakerDone(speaker.id)}
-                >
+                <button className="ghost" onClick={() => handleSpeakerDone(speaker.id)}>
                   完了
                 </button>
               </li>
@@ -410,7 +420,9 @@ export default function ControlApp() {
             </button>
           </div>
           <div className="attendance-stats">
-            <div>出席数: {attendancePresent} / {attendanceTotal}</div>
+            <div>
+              出席数: {attendancePresent} / {attendanceTotal}
+            </div>
             <div>出席率: {attendanceRate}%</div>
             <div>過半数: {attendanceMajority}</div>
             <div>出席数の3分の2: {attendanceTwoThirds}</div>
@@ -464,10 +476,7 @@ export default function ControlApp() {
                   >
                     欠席
                   </button>
-                  <button
-                    className="ghost"
-                    onClick={() => handleAttendanceRemove(member.id)}
-                  >
+                  <button className="ghost" onClick={() => handleAttendanceRemove(member.id)}>
                     削除
                   </button>
                 </div>
@@ -477,63 +486,77 @@ export default function ControlApp() {
         </section>
 
         <section className="panel-section">
-          <h2>ロールコール投票</h2>
-          <p className="helper">国ごとに投票結果を記録します。</p>
-          <ul className="draggable-list">
-            {state.attendance.map((member) => (
-              <li key={member.id}>
-                <span>{member.name}</span>
-                <div className="list-actions">
-                  <button
-                    className={`vote-button yes ${
-                      member.vote === "yes" ? "active" : ""
-                    }`}
-                    onClick={() => handleVoteStatus(member.id, "yes")}
-                  >
-                    賛成
-                  </button>
-                  <button
-                    className={`vote-button no ${
-                      member.vote === "no" ? "active" : ""
-                    }`}
-                    onClick={() => handleVoteStatus(member.id, "no")}
-                  >
-                    反対
-                  </button>
-                  <button
-                    className={`vote-button abstain ${
-                      member.vote === "abstain" ? "active" : ""
-                    }`}
-                    onClick={() => handleVoteStatus(member.id, "abstain")}
-                  >
-                    棄権
-                  </button>
-                  <button
-                    className="ghost"
-                    onClick={() => handleVoteStatus(member.id, "")}
-                  >
-                    クリア
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
+          <h2>投票</h2>
+          <p className="helper">投票結果は4つの独立したDRに対応しています。表示画面には投票集計を表示します。</p>
+          {state.attendance.slice(0, 4).map((member, index) => (
+            <div className="vote-card" key={member.id}>
+              <div className="vote-card-title">DR {index + 1} - {member.name}</div>
+              <div className="list-actions">
+                <button
+                  className={`vote-button yes ${member.vote === "yes" ? "active" : ""}`}
+                  onClick={() => handleVoteStatus(member.id, "yes")}
+                >
+                  賛成
+                </button>
+                <button
+                  className={`vote-button no ${member.vote === "no" ? "active" : ""}`}
+                  onClick={() => handleVoteStatus(member.id, "no")}
+                >
+                  反対
+                </button>
+                <button
+                  className={`vote-button abstain ${member.vote === "abstain" ? "active" : ""}`}
+                  onClick={() => handleVoteStatus(member.id, "abstain")}
+                >
+                  棄権
+                </button>
+                <button
+                  className={`vote-button absent ${member.vote === "absent" ? "active" : ""}`}
+                  onClick={() => handleVoteStatus(member.id, "absent")}
+                >
+                  欠席
+                </button>
+              </div>
+            </div>
+          ))}
+        </section>
+
+        <section className="panel-section">
+          <h2>動議</h2>
+          <button className="accent" onClick={addMotion}>
+            動議を追加
+          </button>
+          <div className="motion-table-wrap">
+            <table className="motion-table">
+              <thead>
+                <tr>
+                  <th>国</th>
+                  <th>動議</th>
+                  <th>時間</th>
+                  <th>方向性・理由</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(state.motions ?? []).map((motion) => (
+                  <tr key={motion.id}>
+                    <td><input className="text-input" value={motion.country} onChange={(event) => updateMotion(motion.id, { country: event.target.value })} /></td>
+                    <td><input className="text-input" value={motion.motion} onChange={(event) => updateMotion(motion.id, { motion: event.target.value })} /></td>
+                    <td><input className="text-input" value={motion.time} onChange={(event) => updateMotion(motion.id, { time: event.target.value })} /></td>
+                    <td><input className="text-input" value={motion.direction} onChange={(event) => updateMotion(motion.id, { direction: event.target.value })} /></td>
+                    <td><button className="ghost" onClick={() => removeMotion(motion.id)}>削除</button></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
 
         <section className="panel-section">
           <h2>資料ファイル</h2>
-          <p className="helper">
-            PDFまたは画像のみ対応しています（PPTXは非対応です）。
-          </p>
-          <p className="helper">
-            ブラウザ保存容量の上限があるため、目安として50MB以下でアップロードしてください。
-          </p>
-          <input
-            type="file"
-            className="file-input"
-            accept=".pdf,.png,.jpg,.jpeg"
-            onChange={handleFileChange}
-          />
+          <p className="helper">PDFまたは画像のみ対応しています（PPTXは非対応です）。</p>
+          <p className="helper">ブラウザ保存容量の上限があるため、目安として50MB以下でアップロードしてください。</p>
+          <input type="file" className="file-input" accept=".pdf,.png,.jpg,.jpeg" onChange={handleFileChange} />
           {state.fileView?.name && (
             <div className="file-meta">
               <div className="file-name">読み込み: {state.fileView.name}</div>
@@ -548,9 +571,7 @@ export default function ControlApp() {
       <main className="preview-panel">
         <div className="preview-header">
           <h2>表示プレビュー</h2>
-          <p>
-            現在の画面: {defaultState.availableViews.find((v) => v.id === state.currentView)?.label}
-          </p>
+          <p>現在の画面: {AVAILABLE_VIEWS.find((v) => v.id === state.currentView)?.label}</p>
         </div>
         <div className="preview-screen">
           <DisplayScreen state={previewState} isPreview />
