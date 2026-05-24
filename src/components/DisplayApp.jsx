@@ -24,40 +24,25 @@ export default function DisplayApp() {
 
   useEffect(() => {
     let active = true;
-
     if (!state.fileView?.id) {
       setFileDataUrl("");
       return undefined;
     }
-
     loadFileDataUrl(state.fileView.id)
-      .then((dataUrl) => {
-        if (active) setFileDataUrl(dataUrl || "");
-      })
-      .catch(() => {
-        if (active) setFileDataUrl("");
-      });
-
-    return () => {
-      active = false;
-    };
+      .then((dataUrl) => { if (active) setFileDataUrl(dataUrl || ""); })
+      .catch(() => { if (active) setFileDataUrl(""); });
+    return () => { active = false; };
   }, [state.fileView?.id]);
 
-  const derivedState = useMemo(() => {
-    return {
-      ...state,
-      timer: updateTimerState(state.timer, 0, now),
-      fileView: {
-        ...state.fileView,
-        dataUrl: fileDataUrl
-      }
-    };
-  }, [state, now, fileDataUrl]);
+  const derivedState = useMemo(() => ({
+    ...state,
+    timer: updateTimerState(state.timer, 0, now),
+    fileView: { ...state.fileView, dataUrl: fileDataUrl }
+  }), [state, now, fileDataUrl]);
 
   useEffect(() => {
     const remaining = derivedState.timer?.remaining ?? 0;
     const prevRemaining = prevRemainingRef.current;
-
     if (prevRemaining !== null && prevRemaining > 0 && remaining === 0) {
       const audio = audioRef.current;
       if (audio) {
@@ -65,7 +50,6 @@ export default function DisplayApp() {
         audio.play().catch(() => {});
       }
     }
-
     prevRemainingRef.current = remaining;
   }, [derivedState.timer?.remaining]);
 
