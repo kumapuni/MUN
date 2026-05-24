@@ -7,7 +7,12 @@ export const createCountryItem = (name) => ({
   id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
   name,
   status: "pending",
-  vote: "",
+  votes: {
+    dr1: "",
+    dr2: "",
+    dr3: "",
+    dr4: ""
+  },
   motions: []
 });
 
@@ -76,7 +81,7 @@ export const updateTimerState = (timer, addMs = 0, now = Date.now()) => {
   return {
     ...timer,
     remaining,
-    running: timer.running,
-    startedAt: timer.running ? timer.startedAt : null
+    running: timer.running && remaining > 0,
+    startedAt: timer.running && remaining > 0 ? timer.startedAt : null
   };
 };
