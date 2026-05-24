@@ -7,7 +7,16 @@ export const createCountryItem = (name) => ({
   id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
   name,
   status: "pending",
-  vote: ""
+  vote: "",
+  motions: []
+});
+
+export const createMotionItem = () => ({
+  id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+  country: "",
+  motion: "",
+  time: "",
+  direction: ""
 });
 
 export const moveItem = (items, fromId, toId) => {
