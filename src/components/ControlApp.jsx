@@ -15,6 +15,7 @@ import {
   removeFile,
   saveFile
 } from "../utils/fileStore.js";
+import { buildMinutesMarkdown, downloadTextFile } from "../utils/minutesExport.js";
 
 const AVAILABLE_VIEWS = defaultState.availableViews;
 const VOTE_TABS = ["DR1", "DR2", "DR3", "DR4"];
@@ -31,6 +32,12 @@ export default function ControlApp() {
     const url = `${window.location.origin}${window.location.pathname}?display=1`;
     window.open(url, "mun-display", "noopener,noreferrer");
   }, []);
+
+  const exportMinutes = useCallback(() => {
+    const markdown = buildMinutesMarkdown(state);
+    const date = new Date().toISOString().slice(0, 10);
+    downloadTextFile(`minutes-${date}.md`, markdown);
+  }, [state]);
 
   const updateState = useCallback((updates) => {
     setState((prev) => ({ ...prev, ...updates }));
@@ -138,7 +145,10 @@ export default function ControlApp() {
             <h1>MUN Display Tool</h1>
             <p>司会操作パネル</p>
           </div>
-          <button className="primary" onClick={openDisplayWindow}>表示ウィンドウを開く</button>
+          <div className="header-actions">
+            <button className="primary" onClick={openDisplayWindow}>表示ウィンドウを開く</button>
+            <button className="secondary" onClick={exportMinutes}>議事録をエクスポート</button>
+          </div>
         </div>
 
         <section className="panel-section">
