@@ -1,3 +1,16 @@
+import { formatDuration } from "./stateUtils.js";
+
+const VOTE_LABELS = {
+  yes: "賛成",
+  no: "反対",
+  abstain: "棄権",
+  absent: "欠席",
+  "": "未投票"
+};
+
+const DR_KEYS = ["dr1", "dr2", "dr3", "dr4"];
+const DR_LABELS = ["DR1", "DR2", "DR3", "DR4"];
+
 export function escapeMarkdown(value = "") {
   return String(value)
     .replace(/\\/g, "\\\\")
@@ -43,23 +56,20 @@ export function buildMinutesMarkdown(state) {
   lines.push("");
 
   lines.push("## 投票結果");
-  const voteLabel = (vote) => {
-    if (vote === "yes") return "賛成";
-    if (vote === "no") return "反対";
-    if (vote === "abstain") return "棄権";
-    if (vote === "absent") return "欠席";
-    return "未投票";
-  };
   if ((state.attendance?.length ?? 0) === 0) {
     lines.push("- なし");
   } else {
-    lines.push("| 国名 | 投票 |");
-    lines.push("| --- | --- |");
-    state.attendance.forEach((member) => {
-      lines.push(`| ${escapeMarkdown(member.name)} | ${voteLabel(member.vote)} |`);
+    DR_KEYS.forEach((drKey, index) => {
+      lines.push(`### ${DR_LABELS[index]}`);
+      lines.push("| 国名 | 投票 |");
+      lines.push("| --- | --- |");
+      state.attendance.forEach((member) => {
+        const vote = member.votes?.[drKey] ?? "";
+        lines.push(`| ${escapeMarkdown(member.name)} | ${VOTE_LABELS[vote] ?? "未投票"} |`);
+      });
+      lines.push("");
     });
   }
-  lines.push("");
 
   lines.push("## 動議");
   if ((state.motions?.length ?? 0) === 0) {
@@ -88,3 +98,5 @@ export function downloadTextFile(filename, content) {
   link.remove();
   URL.revokeObjectURL(url);
 }
+
+export { DR_KEYS, DR_LABELS };
