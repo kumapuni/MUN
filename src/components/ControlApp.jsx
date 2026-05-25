@@ -245,32 +245,127 @@ export default function ControlApp() {
             ))}
           </ul>
         </section>
+        
+<section className="panel-section">
+  <h2>投票</h2>
 
-        <section className="panel-section">
-          <h2>投票</h2>
-          <div className="button-grid">
-            {VOTE_TABS.map((tab, index) => (
-              <button key={tab} className={activeVoteTab === index ? "accent" : "secondary"} onClick={() => setActiveVoteTab(index)}>{tab}</button>
-            ))}
-          </div>
-          <div className="attendance-stats display-stats">
-            <div>賛成: {state.attendance.filter((m) => m.votes?.[currentVoteKey] === "yes").length}</div>
-            <div>反対: {state.attendance.filter((m) => m.votes?.[currentVoteKey] === "no").length}</div>
-            <div>棄権: {state.attendance.filter((m) => m.votes?.[currentVoteKey] === "abstain").length}</div>
-            <div>欠席: {state.attendance.filter((m) => m.votes?.[currentVoteKey] === "absent").length}</div>
-          </div>
-          <div className="vote-card">
-            <div className="vote-card-title">{VOTE_TABS[activeVoteTab]}</div>
-            <div className="list-actions">
-              <button className="vote-button yes" onClick={() => handleVoteStatus(state.attendance[0]?.id, "yes")} disabled={!state.attendance[0]}>賛成</button>
-              <button className="vote-button no" onClick={() => handleVoteStatus(state.attendance[0]?.id, "no")} disabled={!state.attendance[0]}>反対</button>
-              <button className="vote-button abstain" onClick={() => handleVoteStatus(state.attendance[0]?.id, "abstain")} disabled={!state.attendance[0]}>棄権</button>
-              <button className="vote-button absent" onClick={() => handleVoteStatus(state.attendance[0]?.id, "absent")} disabled={!state.attendance[0]}>欠席</button>
-            </div>
-            <p className="helper">DRごとにタブを切り替えて、国ごとの投票を記録します。</p>
-          </div>
-        </section>
+  <div className="button-grid">
+    {VOTE_TABS.map((tab, index) => (
+      <button
+        key={tab}
+        className={activeVoteTab === index ? "accent" : "secondary"}
+        onClick={() => setActiveVoteTab(index)}
+      >
+        {tab}
+      </button>
+    ))}
+  </div>
 
+  <div className="attendance-stats display-stats">
+    <div>
+      賛成:{" "}
+      {
+        state.attendance.filter(
+          (member) => member.votes?.[currentVoteKey] === "yes"
+        ).length
+      }
+    </div>
+    <div>
+      反対:{" "}
+      {
+        state.attendance.filter(
+          (member) => member.votes?.[currentVoteKey] === "no"
+        ).length
+      }
+    </div>
+    <div>
+      棄権:{" "}
+      {
+        state.attendance.filter(
+          (member) => member.votes?.[currentVoteKey] === "abstain"
+        ).length
+      }
+    </div>
+    <div>
+      欠席:{" "}
+      {
+        state.attendance.filter(
+          (member) => member.votes?.[currentVoteKey] === "absent"
+        ).length
+      }
+    </div>
+  </div>
+
+  <div className="vote-table-wrapper">
+    <table className="vote-table">
+      <thead>
+        <tr>
+          <th>国名</th>
+          <th>投票状態</th>
+          <th>賛成</th>
+          <th>反対</th>
+          <th>棄権</th>
+          <th>欠席</th>
+        </tr>
+      </thead>
+      <tbody>
+        {state.attendance.map((member) => {
+          const currentVote = member.votes?.[currentVoteKey] ?? "";
+          return (
+            <tr key={member.id}>
+              <td>{member.name}</td>
+              <td>{currentVote ? currentVote : "未投票"}</td>
+              <td>
+                <button
+                  className={`vote-button yes ${
+                    currentVote === "yes" ? "active" : ""
+                  }`}
+                  onClick={() => handleVoteStatus(member.id, "yes")}
+                >
+                  ●
+                </button>
+              </td>
+              <td>
+                <button
+                  className={`vote-button no ${
+                    currentVote === "no" ? "active" : ""
+                  }`}
+                  onClick={() => handleVoteStatus(member.id, "no")}
+                >
+                  ●
+                </button>
+              </td>
+              <td>
+                <button
+                  className={`vote-button abstain ${
+                    currentVote === "abstain" ? "active" : ""
+                  }`}
+                  onClick={() => handleVoteStatus(member.id, "abstain")}
+                >
+                  ●
+                </button>
+              </td>
+              <td>
+                <button
+                  className={`vote-button absent ${
+                    currentVote === "absent" ? "active" : ""
+                  }`}
+                  onClick={() => handleVoteStatus(member.id, "absent")}
+                >
+                  ●
+                </button>
+              </td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  </div>
+
+  <p className="helper">
+    {VOTE_TABS[activeVoteTab]} を編集しています。各国の投票はこのDRに対して保存されます。
+  </p>
+</section>
         <section className="panel-section">
           <h2>動議</h2>
           <button className="accent" onClick={addMotion}>動議を追加</button>
