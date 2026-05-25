@@ -19,6 +19,7 @@ import { buildMinutesMarkdown, downloadTextFile } from "../utils/minutesExport.j
 
 const AVAILABLE_VIEWS = defaultState.availableViews;
 const VOTE_TABS = ["DR1", "DR2", "DR3", "DR4"];
+const voteKeyByTab = ["dr1", "dr2", "dr3", "dr4"];
 
 export default function ControlApp() {
   const [state, setState] = useSharedState(true);
@@ -27,6 +28,7 @@ export default function ControlApp() {
   const [timerInput, setTimerInput] = useState(5);
   const [filePreviewUrl, setFilePreviewUrl] = useState("");
   const [activeVoteTab, setActiveVoteTab] = useState(0);
+  const currentVoteKey = voteKeyByTab[activeVoteTab];
 
   const openDisplayWindow = useCallback(() => {
     const url = `${window.location.origin}${window.location.pathname}?display=1`;
@@ -87,7 +89,7 @@ export default function ControlApp() {
   const handleAttendanceDrop = (fromId, toId) => setState((prev) => ({ ...prev, attendance: moveItem(prev.attendance, fromId, toId) }));
   const handleSpeakerDone = (id) => setState((prev) => ({ ...prev, speakers: prev.speakers.filter((item) => item.id !== id) }));
   const handleAttendanceStatus = (id, status) => setState((prev) => ({ ...prev, attendance: prev.attendance.map((item) => (item.id === id ? { ...item, status } : item)) }));
-  const handleVoteStatus = (id, vote) => setState((prev) => ({ ...prev, attendance: prev.attendance.map((item) => (item.id === id ? { ...item, vote } : item)) }));
+  const handleVoteStatus = (id, vote) => setState((prev) => ({ ...prev, attendance: prev.attendance.map((item) => (item.id === id ? { ...item, votes: { ...(item.votes ?? {}), [currentVoteKey]: vote } } : item)) }));
 
   const handleFileChange = async (event) => {
     const file = event.target.files?.[0];
@@ -252,20 +254,20 @@ export default function ControlApp() {
             ))}
           </div>
           <div className="attendance-stats display-stats">
-            <div>賛成: {state.attendance.filter((m) => m.vote === "yes").length}</div>
-            <div>反対: {state.attendance.filter((m) => m.vote === "no").length}</div>
-            <div>棄権: {state.attendance.filter((m) => m.vote === "abstain").length}</div>
-            <div>欠席: {state.attendance.filter((m) => m.vote === "absent").length}</div>
+            <div>賛成: {state.attendance.filter((m) => m.votes?.[currentVoteKey] === "yes").length}</div>
+            <div>反対: {state.attendance.filter((m) => m.votes?.[currentVoteKey] === "no").length}</div>
+            <div>棄権: {state.attendance.filter((m) => m.votes?.[currentVoteKey] === "abstain").length}</div>
+            <div>欠席: {state.attendance.filter((m) => m.votes?.[currentVoteKey] === "absent").length}</div>
           </div>
           <div className="vote-card">
             <div className="vote-card-title">{VOTE_TABS[activeVoteTab]}</div>
             <div className="list-actions">
-              <button className="vote-button yes" onClick={() => handleVoteStatus(state.attendance[activeVoteTab]?.id, "yes")}>賛成</button>
-              <button className="vote-button no" onClick={() => handleVoteStatus(state.attendance[activeVoteTab]?.id, "no")}>反対</button>
-              <button className="vote-button abstain" onClick={() => handleVoteStatus(state.attendance[activeVoteTab]?.id, "abstain")}>棄権</button>
-              <button className="vote-button absent" onClick={() => handleVoteStatus(state.attendance[activeVoteTab]?.id, "absent")}>欠席</button>
+              <button className="vote-button yes" onClick={() => handleVoteStatus(state.attendance[0]?.id, "yes")} disabled={!state.attendance[0]}>賛成</button>
+              <button className="vote-button no" onClick={() => handleVoteStatus(state.attendance[0]?.id, "no")} disabled={!state.attendance[0]}>反対</button>
+              <button className="vote-button abstain" onClick={() => handleVoteStatus(state.attendance[0]?.id, "abstain")} disabled={!state.attendance[0]}>棄権</button>
+              <button className="vote-button absent" onClick={() => handleVoteStatus(state.attendance[0]?.id, "absent")} disabled={!state.attendance[0]}>欠席</button>
             </div>
-            <p className="helper">DRごとにタブを切り替えて同じ投票操作を行えます。</p>
+            <p className="helper">DRごとにタブを切り替えて、国ごとの投票を記録します。</p>
           </div>
         </section>
 
