@@ -116,9 +116,10 @@ export default function DisplayScreen({ state, isPreview }) {
         </div>
       )}
 
-      {view === "vote" && (
+          {view === "vote" && (
         <div className="screen-list">
           <h1>投票</h1>
+          <div className="helper">現在のDR: {state.currentVoteTabLabel ?? "DR1"}</div>
           <div className="attendance-stats display-stats">
             <div>賛成: {voteCounts.yes}</div>
             <div>反対: {voteCounts.no}</div>
@@ -140,17 +141,17 @@ export default function DisplayScreen({ state, isPreview }) {
                 {state.attendance.map((member) => (
                   <tr key={member.id}>
                     <td>{member.name}</td>
-                    <td className={member.vote === "yes" ? "vote-mark" : ""}>
-                      {member.vote === "yes" ? "●" : ""}
+                    <td className={member.votes?.[state.currentVoteKey] === "yes" ? "vote-mark" : ""}>
+                      {member.votes?.[state.currentVoteKey] === "yes" ? "●" : ""}
                     </td>
-                    <td className={member.vote === "no" ? "vote-mark" : ""}>
-                      {member.vote === "no" ? "●" : ""}
+                    <td className={member.votes?.[state.currentVoteKey] === "no" ? "vote-mark" : ""}>
+                      {member.votes?.[state.currentVoteKey] === "no" ? "●" : ""}
                     </td>
-                    <td className={member.vote === "abstain" ? "vote-mark" : ""}>
-                      {member.vote === "abstain" ? "●" : ""}
+                    <td className={member.votes?.[state.currentVoteKey] === "abstain" ? "vote-mark" : ""}>
+                      {member.votes?.[state.currentVoteKey] === "abstain" ? "●" : ""}
                     </td>
-                    <td className={member.vote === "absent" ? "vote-mark" : ""}>
-                      {member.vote === "absent" ? "●" : ""}
+                    <td className={member.votes?.[state.currentVoteKey] === "absent" ? "vote-mark" : ""}>
+                      {member.votes?.[state.currentVoteKey] === "absent" ? "●" : ""}
                     </td>
                   </tr>
                 ))}
@@ -159,7 +160,6 @@ export default function DisplayScreen({ state, isPreview }) {
           </div>
         </div>
       )}
-
       {view === "motion" && (
         <div className="screen-list">
           <h1>動議</h1>
