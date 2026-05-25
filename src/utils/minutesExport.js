@@ -22,6 +22,20 @@ export function escapeMarkdown(value = "") {
     .replace(/-/g, "\\-");
 }
 
+function countVotesForDr(attendance, drKey) {
+  return attendance.reduce(
+    (acc, member) => {
+      const vote = member.votes?.[drKey];
+      if (vote === "yes") acc.yes += 1;
+      if (vote === "no") acc.no += 1;
+      if (vote === "abstain") acc.abstain += 1;
+      if (vote === "absent") acc.absent += 1;
+      return acc;
+    },
+    { yes: 0, no: 0, abstain: 0, absent: 0 }
+  );
+}
+
 export function buildMinutesMarkdown(state) {
   const title = state.agendaText?.trim() || "議題未設定";
   const now = new Date();
@@ -60,7 +74,13 @@ export function buildMinutesMarkdown(state) {
     lines.push("- なし");
   } else {
     DR_KEYS.forEach((drKey, index) => {
+      const counts = countVotesForDr(state.attendance, drKey);
       lines.push(`### ${DR_LABELS[index]}`);
+      lines.push(`- 賛成: ${counts.yes}`);
+      lines.push(`- 反対: ${counts.no}`);
+      lines.push(`- 棄権: ${counts.abstain}`);
+      lines.push(`- 欠席: ${counts.absent}`);
+      lines.push("");
       lines.push("| 国名 | 投票 |");
       lines.push("| --- | --- |");
       state.attendance.forEach((member) => {
